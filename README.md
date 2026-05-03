@@ -1,90 +1,308 @@
-# Debate Repo
+# Debate Studio
 
-This repo contains the debate-to-video pipeline: debate logs, transcript cleanup,
-TTS script generation, CosyVoice audio, Whisper timing checks, and Remotion video
-rendering.
+Debate Studio is a local, end-to-end debate-to-video production pipeline. It
+starts from a raw debate topic or topic framework, generates a structured
+debate, reshapes the written debate into a spoken transcript, generates
+multi-speaker CosyVoice audio, verifies timing with Whisper, and renders a
+Remotion video.
 
-The current workstation runtime is one Conda environment named `debate`. It
-replaces the older cross-environment flow that used separate debate, CosyVoice,
-and Remotion environments.
+This repository is now standalone. It was originally developed inside a larger
+`LLM` workspace with several sibling projects and separate Conda environments.
+The current goal of this repo is to keep the whole production chain in one
+place, with one local runtime and one dashboard.
 
-## Current Runtime
+## Current Status
 
-- Conda env: `debate`
-- Python: `C:\Users\ctz20\anaconda3\envs\debate\python.exe`
-- Node/npm: installed inside the same Conda env
-- Local overrides: `pipeline.config.local.json` (ignored by Git)
-- Model/cache root: repo-local `.cache/`
+This is a workstation-oriented project rather than a plug-and-play hosted
+service. It has been tested on a local Windows machine with a CUDA-capable
+NVIDIA GPU and a unified Conda environment named `debate`.
 
-See [ENVIRONMENT.md](./ENVIRONMENT.md) for the exact package versions, local
-config, CUDA llama-cpp notes, and verification commands.
+The framework is functional:
 
-The debate stage can stay relatively formal and analytical. During
-`json_to_transcript.py`, free-debate turns are reshaped for the audience: long
-written turns are split into shorter spoken exchanges, then same-turn positive
-and negative chunks are interleaved into a more live back-and-forth rhythm, with
-a host bridge after the opening statements. A second exchange-rewrite pass then
-rewrites each short free-debate chunk against the previous opponent chunk, so
-the output behaves more like actual clash instead of alternating chopped-up
-monologues.
+- topic/topic-framework generation
+- local or API-backed debate generation
+- debate-log cleanup
+- transcript reshaping for spoken delivery
+- free-debate splitting, interleaving, and clash rewrite
+- TTS script generation with speaking tags
+- CosyVoice audio generation
+- optional Whisper timing verification
+- Remotion video rendering
+- local dashboard for staged pipeline runs
 
-## Quick Start
+There are still rough edges. Progress is currently inferred from logs, the
+dashboard stores job state in memory, voice-pack management is local and simple,
+and the Remotion layout preview is schematic rather than a full render preview.
 
-Start the local dashboard:
+## Pipeline
+
+The intended production flow is:
+
+```text
+raw topic
+  -> topic framework
+  -> debate log
+  -> cleaned log
+  -> audience-facing transcript
+  -> TTS script
+  -> WAV + timing JSON
+  -> MP4 video
+```
+
+The main orchestrator is `debate_pipeline.py`. It supports full runs and partial
+runs so you can iterate from any stage without regenerating everything.
+
+Important stages:
+
+- `debate_topic_generator.py` creates a structured topic framework.
+- `debate.py` generates the formal debate log.
+- `clean_logs.py` normalizes generated debate logs.
+- `json_to_transcript.py` converts formal debate text into spoken, audience
+  oriented turns.
+- `transcript_to_tts.py` inserts TTS-friendly speaking tags.
+- `pipeline/tts/generate_debate_audio.py` generates multi-speaker audio and
+  timing metadata.
+- `pipeline/video/remotion/` renders the final video.
+
+## Dashboard
+
+The easiest local entry point is the dashboard:
 
 ```powershell
-cd G:\Coding\01_AI-ML\LLM\debate
 conda activate debate
 python dashboard_app.py
 ```
 
-Then open `http://127.0.0.1:7861`. The dashboard lets you choose the pipeline
-entry point, choose where the run should stop, start/stop a run, watch stage
-progress, follow live logs, test voice packs, preview video layouts, and open
-generated artifacts. While a job is running, setup controls are locked so the
-active run cannot be accidentally changed from another tab.
+Open:
 
-Generated run artifacts and local voice packs are intentionally ignored by Git.
-Keep voice packs under `assets/voices/<pack>/host`, `positive`, and `negative`
-on the workstation rather than committing private/licensed samples.
+```text
+http://127.0.0.1:7861
+```
 
-CLI remains available for scripted runs:
+The dashboard can:
+
+- choose the pipeline entry point: Topic, Log, Transcript, TTS, or Video
+- choose where a run should stop with `Run until`
+- start and stop local jobs
+- lock setup controls while a job is running
+- show stage progress, command output, live logs, and artifacts
+- select a local voice pack
+- generate a short TTS voice preview from custom text
+- preview the broad shape of available video layouts
+
+## CLI Examples
+
+Run from raw topic text:
 
 ```powershell
-cd G:\Coding\01_AI-ML\LLM\debate
-conda activate debate
+python debate_pipeline.py from-topic `
+  --topic "当胎儿生命权与女性身体自主权发生冲突时，应优先保护女性身体自主权。" `
+  --turns 3 `
+  --provider local `
+  --layout dual `
+  --port 8099
+```
+
+Run from an existing topic framework:
+
+```powershell
+python debate_pipeline.py from-topic `
+  --topic-file topics\my_topic.md `
+  --turns 3 `
+  --provider local `
+  --layout dual `
+  --port 8099
+```
+
+Continue from the latest debate log:
+
+```powershell
 python debate_pipeline.py from-log --log latest --provider local --layout dual --port 8099
 ```
 
-Run from a generated topic framework:
+Stop after an intermediate stage:
 
 ```powershell
-python debate_pipeline.py from-topic --topic-file topics\my_topic.md --turns 3 --provider local --layout dual --port 8099
+python debate_pipeline.py from-topic --topic-file topics\my_topic.md --turns 3 --provider local --stop-after transcript
+python debate_pipeline.py from-tts --tts-script latest --voice-root assets\voices\default --stop-after audio
 ```
 
-Or give the pipeline a raw topic and let it generate the framework first:
+Render video only from an existing timing JSON:
 
 ```powershell
-python debate_pipeline.py from-topic --topic "当胎儿生命权与女性身体自主权发生冲突时，应优先保护女性身体自主权。" --turns 3 --provider local --layout dual --port 8099
+python debate_pipeline.py video --timeline latest --layout podcast --port 8099
 ```
 
-Or generate a fresh debate log only:
+## Runtime Expectations
 
-```powershell
-python debate.py --provider local --topic-file topics\my_topic.md --turns 3
+The canonical local runtime is a single Conda environment named `debate`.
+
+The verified workstation runtime includes:
+
+- Python `3.10`
+- CUDA-enabled PyTorch and torchaudio
+- CUDA-enabled `llama-cpp-python`
+- CosyVoice dependencies
+- Whisper
+- Node/npm for Remotion
+- API SDKs for OpenAI, Anthropic, Gemini, and OpenRouter-compatible providers
+
+See [ENVIRONMENT.md](./ENVIRONMENT.md) for the exact verified local versions,
+CUDA llama-cpp notes, and rebuild commands.
+
+## Configuration
+
+Portable defaults live in:
+
+```text
+pipeline.config.json
+pipeline.config.example.json
+pipeline.config.local.example.json
 ```
 
-## API Providers
+Machine-specific overrides belong in:
 
-The same environment also has the API SDKs installed. Set the relevant key and
-choose the provider:
+```text
+pipeline.config.local.json
+```
+
+`pipeline.config.local.json` is intentionally ignored by Git. Use it for local
+Python/Node executable paths, local model paths, and machine-specific overrides.
+
+API-backed providers read keys from environment variables. For example:
 
 ```powershell
 $env:OPENROUTER_API_KEY = "sk-or-..."
 python debate_pipeline.py from-log --log latest --provider openrouter --layout dual --port 8099
 ```
 
-## Main docs
+## Local Assets Not Included
 
-See [PRODUCTION_PIPELINE.md](./PRODUCTION_PIPELINE.md) for the full pipeline,
-configuration, and render workflow.
+This repo intentionally does not include generated artifacts or private local
+assets.
+
+Ignored local outputs include:
+
+- `.cache/`
+- `output/`
+- `logs/`
+- `topics/`
+- `transcripts/`
+- `tts_scripts/`
+- `run_records/`
+- `pipeline.config.local.json`
+- local model/checkpoint files such as `.gguf`, `.safetensors`, `.pt`, `.onnx`
+- generated audio/video such as `.wav`, `.mp3`, `.mp4`
+- local voice packs under `assets/voices/`
+
+Voice packs should be placed locally in this shape:
+
+```text
+assets/voices/<pack>/host/
+assets/voices/<pack>/positive/
+assets/voices/<pack>/negative/
+```
+
+Each voice directory should contain audio samples and matching `.txt`
+transcripts. They are ignored because they may contain private or licensed
+voice material.
+
+## Transcript Design
+
+The debate generation stage can remain relatively formal and analytical. The
+audience-facing transformation happens later in `json_to_transcript.py`.
+
+For free-debate sections, the transcript stage can:
+
+- keep opening and closing statements as larger structured turns
+- split long written turns into shorter spoken exchanges
+- interleave positive and negative chunks into a back-and-forth rhythm
+- add a host bridge before free debate begins
+- rewrite each free-debate chunk against the previous opponent chunk so the
+  exchange feels more like clash than alternating monologues
+
+Useful compatibility flags:
+
+```powershell
+python json_to_transcript.py ... --no-split-free-debate
+python json_to_transcript.py ... --no-interleave-free-debate
+python json_to_transcript.py ... --no-rewrite-free-debate-exchanges
+```
+
+## Video Layouts
+
+The Remotion renderer currently supports:
+
+- `dual`
+- `podcast`
+- `mindmap`
+
+Render flags pass through from `debate_pipeline.py`, including:
+
+- `--plan`
+- `--audio`
+- `--out`
+- `--max-seconds`
+- `--concurrency`
+- `--gl`
+- `--port`
+- `--keep-bundle`
+- `--keep-staged-audio`
+
+The Remotion project lives under:
+
+```text
+pipeline/video/remotion/
+```
+
+Check the composition with:
+
+```powershell
+cd pipeline\video\remotion
+npm run compositions
+```
+
+Expected composition id:
+
+```text
+user-debate-video
+```
+
+## Repository Layout
+
+```text
+.
+├── dashboard_app.py
+├── debate_pipeline.py
+├── debate.py
+├── debate_topic_generator.py
+├── clean_logs.py
+├── json_to_transcript.py
+├── transcript_to_tts.py
+├── pipeline/
+│   ├── tts/
+│   └── video/remotion/
+├── third_party/
+│   ├── CosyVoice/
+│   └── Matcha-TTS/
+├── ENVIRONMENT.md
+├── PRODUCTION_PIPELINE.md
+└── REPO_CONTEXT.md
+```
+
+## Docs
+
+- [PRODUCTION_PIPELINE.md](./PRODUCTION_PIPELINE.md) explains the full pipeline
+  and operational workflow.
+- [ENVIRONMENT.md](./ENVIRONMENT.md) documents the verified local Conda
+  environment and rebuild notes.
+- [REPO_CONTEXT.md](./REPO_CONTEXT.md) contains deeper repo context and design
+  notes.
+
+## Practical Notes
+
+- This repo is currently optimized for a Windows + Conda + CUDA workstation.
+- Model weights and generated outputs are local by design.
+- The dashboard is a local control panel, not a multi-user service.
+- The project is useful as a production pipeline, but it still benefits from
+  careful staged testing when models, voices, or layouts change.
