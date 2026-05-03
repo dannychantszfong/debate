@@ -1,0 +1,56 @@
+{
+  "executables": {
+    "main_python": "python",
+    "tts_python": "python",
+    "node": "node",
+    "node_package_manager": "npm"
+  },
+  "llm": {
+    "local_model_path": ".cache/models/qwen2.5-3b-instruct-q4_k_m.gguf",
+    "local_n_gpu_layers": -1,
+    "local_n_ctx": 16384,
+    "default_model_name": "Qwen2.5-3B-Instruct-Q4_K_M"
+  },
+  "tts": {
+    "model_dir": ".cache/models/Fun-CosyVoice3-0.5B-2512",
+    "voice_root": "assets/voices/default",
+    "speaker_dirs": {
+      "positive": "positive",
+      "negative": "negative",
+      "host": "host"
+    },
+    "output_dir": "output/audio",
+    "inter_turn_pause_ms": 600,
+    "intra_turn_pause_ms": 250,
+    "verify_with_whisper": true,
+    "whisper_model_name": "small",
+    "whisper_model_dir": ".cache/whisper",
+    "whisper_language": "Chinese",
+    "cer_threshold": 0.25,
+    "min_chars_to_verify": 4,
+    "primary_attempts": 3,
+    "fallback_attempts_per_voice": 1,
+    "max_fallback_voices": 3,
+    "base_seed": 20250418
+  },
+  "video": {
+    "app_dir": "pipeline/video/remotion",
+    "output_dir": "output/video",
+    "default_layout": "dual"
+  },
+  "bootstrap": {
+    "local_llm_model_source": null,
+    "cosyvoice_model_source": null,
+    "local_llm_download": {
+      "provider": "huggingface",
+      "repo_id": "Qwen/Qwen2.5-3B-Instruct-GGUF",
+      "filename": "qwen2.5-3b-instruct-q4_k_m.gguf",
+      "enabled": true
+    },
+    "cosyvoice_download": {
+      "provider": "modelscope",
+      "repo_id": "FunAudioLLM/Fun-CosyVoice3-0.5B-2512",
+      "enabled": true
+    }
+  }
+}

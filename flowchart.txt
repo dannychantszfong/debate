@@ -1,0 +1,17 @@
+1. One-time repo setup
+conda activate debate
+
+2. Full production line from a topic framework
+python debate_pipeline.py from-topic --topic-file topics\my_topic.md --turns 3 --provider local --layout dual --port 8099
+
+3. Full production line from the latest debate log
+python debate_pipeline.py from-log --log latest --provider local --layout dual --port 8099
+
+4. Resume from an existing transcript
+python debate_pipeline.py from-transcript --transcript latest --provider local --layout dual --port 8099
+
+5. Resume from an existing TTS script
+python debate_pipeline.py from-tts --tts-script latest --layout dual --port 8099
+
+6. Re-render video only from an existing timing JSON
+python debate_pipeline.py video --timeline latest --layout podcast --port 8099

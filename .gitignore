@@ -1,0 +1,50 @@
+.cache/
+output/
+.venv/
+.env
+.env.*
+!.env.example
+!.env.*.example
+.config
+.claude/settings.local.json
+pipeline.config.local.json
+pipeline.config.local.*.json
+pipeline/video/remotion/node_modules/
+**/__pycache__/
+**/*.pyc
+comment.txt
+debate_topic.txt
+experience.txt
+path.txt
+
+# Generated pipeline artifacts. Keep them local; they can include long model
+# outputs, run diagnostics, audio/video timing, and sensitive topic drafts.
+logs/
+topics/
+transcripts/
+tts_scripts/
+run_records/
+
+# Local voice packs may contain private/licensed voice samples.
+assets/voices/
+
+# Large model/checkpoint files should stay in .cache/ or another local path.
+*.gguf
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.bin
+
+# Media outputs and generated previews.
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.mp4
+
+# Remotion may stage generated timing JSON for local preview.
+pipeline/video/remotion/src/UserDebate/data/*.json
+!pipeline/video/remotion/src/UserDebate/data/sample-timeline.json

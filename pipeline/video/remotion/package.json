@@ -1,0 +1,25 @@
+{
+  "name": "debate-remotion-renderer",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "remotion studio src/UserDebate/entry.tsx",
+    "compositions": "remotion compositions src/UserDebate/entry.tsx",
+    "render-user-debate": "node render-user-debate.cjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.448",
+    "@remotion/cli": "4.0.448",
+    "@remotion/renderer": "4.0.448",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.448",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "duration": 12,
+  "turns": [
+    {
+      "turn": 1,
+      "speaker": "host",
+      "start": 0,
+      "end": 3,
+      "duration": 3,
+      "content": "欢迎来到本场辩论。今天我们用一个简短样例检查视频布局。"
+    },
+    {
+      "turn": 2,
+      "speaker": "positive",
+      "start": 3.4,
+      "end": 7,
+      "duration": 3.6,
+      "content": "正方认为，好的辩论需要清楚的立论和直接回应。"
+    },
+    {
+      "turn": 3,
+      "speaker": "negative",
+      "start": 7.4,
+      "end": 12,
+      "duration": 4.6,
+      "content": "反方回应，观点之外还要看证据、例外和实际代价。"
+    }
+  ],
+  "segments": [
+    {
+      "turn": 1,
+      "speaker": "host",
+      "text": "欢迎来到本场辩论。",
+      "start": 0,
+      "end": 1.4,
+      "accepted": true
+    },
+    {
+      "turn": 1,
+      "speaker": "host",
+      "text": "今天我们用一个简短样例检查视频布局。",
+      "start": 1.4,
+      "end": 3,
+      "accepted": true
+    },
+    {
+      "turn": 2,
+      "speaker": "positive",
+      "text": "正方认为，好的辩论需要清楚的立论和直接回应。",
+      "start": 3.4,
+      "end": 7,
+      "accepted": true
+    },
+    {
+      "turn": 3,
+      "speaker": "negative",
+      "text": "反方回应，观点之外还要看证据、例外和实际代价。",
+      "start": 7.4,
+      "end": 12,
+      "accepted": true
+    }
+  ]
+}

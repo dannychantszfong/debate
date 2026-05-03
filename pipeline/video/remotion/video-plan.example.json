@@ -1,0 +1,132 @@
+{
+  "cast": [
+    {
+      "id": "host",
+      "displayName": "主持",
+      "role": "host",
+      "side": "center",
+      "avatarLabel": "主持"
+    },
+    {
+      "id": "positive",
+      "displayName": "正方",
+      "role": "debater",
+      "side": "left",
+      "avatarLabel": "正方",
+      "accent": "#26E0C8"
+    },
+    {
+      "id": "negative",
+      "displayName": "反方",
+      "role": "debater",
+      "side": "right",
+      "avatarLabel": "反方",
+      "accent": "#FF8B5E"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "opening",
+      "label": "开场立论",
+      "start": 0,
+      "end": 1200
+    },
+    {
+      "id": "clash",
+      "label": "核心攻防",
+      "start": 1200,
+      "end": 6200
+    },
+    {
+      "id": "closing",
+      "label": "总结陈词",
+      "start": 6200,
+      "end": 7595
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-positive-1",
+      "speaker": "positive",
+      "turn": 2,
+      "start": 170.34,
+      "end": 377.07,
+      "summary": "女性身体自主权是更高位阶的现实权利。",
+      "type": "claim",
+      "topic": "权利位阶",
+      "evidenceIds": [
+        "evidence-positive-1"
+      ]
+    },
+    {
+      "id": "claim-negative-1",
+      "speaker": "negative",
+      "turn": 3,
+      "start": 377.67,
+      "end": 608.85,
+      "summary": "亲子责任不能被简单类比为陌生人之间的器官捐献义务。",
+      "type": "rebuttal",
+      "topic": "责任伦理",
+      "evidenceIds": [
+        "evidence-negative-1"
+      ],
+      "targets": [
+        "claim-positive-1"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-positive-1",
+      "claimId": "claim-positive-1",
+      "start": 237.8,
+      "end": 287.2,
+      "label": "高危妊娠例子",
+      "summary": "正方用高风险妊娠举例，强调载体的安全与意愿是生命延续的前提。",
+      "kind": "example"
+    },
+    {
+      "id": "evidence-negative-1",
+      "claimId": "claim-negative-1",
+      "start": 460.2,
+      "end": 518.4,
+      "label": "亲子责任反驳",
+      "summary": "反方强调孕妇与胎儿并非陌生人关系，因此不能直接套用捐肾思想实验。",
+      "kind": "support"
+    }
+  ],
+  "assets": [
+    {
+      "id": "asset-chart-1",
+      "type": "chart",
+      "caption": "可选：后续纪录片布局可接入图表或图片素材"
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot-opening",
+      "start": 0,
+      "end": 170,
+      "layout": "dual",
+      "focusSpeaker": "host",
+      "captionSource": "segment",
+      "note": "主持开场，适合经典双栏布局"
+    },
+    {
+      "id": "shot-claim-map",
+      "start": 377.67,
+      "end": 608.85,
+      "layout": "mindmap",
+      "focusSpeaker": "negative",
+      "captionSource": "claim",
+      "showClaimIds": [
+        "claim-positive-1",
+        "claim-negative-1"
+      ],
+      "showEvidenceIds": [
+        "evidence-negative-1"
+      ],
+      "note": "攻防段可切到论点图谱"
+    }
+  ]
+}
